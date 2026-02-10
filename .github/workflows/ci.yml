@@ -12,9 +12,9 @@ name: CICD Pipeline for develop/feature branch
 
 on:
   pull_request:
-    branches: [ develop ]
+    branches: [ main ]
   push:
-    branches: [ develop ]
+    branches: [ main ]
 
 permissions:
   contents: read
