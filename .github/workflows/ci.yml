@@ -47,6 +47,15 @@ jobs:
           node-version: 18
           
       - run: chmod +x mvnw && ./mvnw -v
+
+      - name: Cache Maven local repository
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            maven-
+
       - name: Extract project version
         id: version
         run: |
@@ -86,13 +95,22 @@ jobs:
         with:
           name: coverage
           path: coverage
+
       - run: chmod +x mvnw && ./mvnw -v
+      - name: Cache Maven local repository
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            maven-
+
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@v2
         with:
           args: >
-            -Dsonar.projectKey=your_project_key
-            -Dsonar.organization=your_org
+            -Dsonar.projectKey=elenapaun000
+            -Dsonar.organization=elenapaun000
             -Dsonar.coverage.jacoco.xmlReportPaths=coverage/**/jacoco.xml
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -104,6 +122,15 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+
+      - run: chmod +x mvnw && ./mvnw -v
+      - name: Cache Maven local repository
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            maven-
 
       - name: Run OWASP Dependency Check
         run: mvn org.owasp:dependency-check-maven:check
