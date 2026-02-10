@@ -1,0 +1,110 @@
+name: CICD Pipeline for develop/feature branch
+
+# on:
+#   workflow_call:
+#     inputs:
+#       config-path:
+#         required: false
+#         type: string
+#     secrets:
+#       token:
+#         required: false
+
+on:
+  pull_request:
+    branches: [ develop ]
+  push:
+    branches: [ develop ]
+
+permissions:
+  contents: read
+
+jobs:
+  #------------------------------------------------------------------------------------
+  # Build Job: Installs dependencies, builds the frontend, and uploads the build artifact.
+  #------------------------------------------------------------------------------------
+  build:
+    name: Build & Test
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    outputs:
+      revision: ${{ steps.version.outputs.version }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+          cache: maven
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Extract project version
+        id: version
+        run: |
+          VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Build with coverage
+        run: |
+          ./mvnw -B clean verify \
+            -DskipBndBaseline=true \
+            -DskipRemoteStaging=true
+
+      - name: Upload coverage artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: |
+            **/target/site/jacoco/jacoco.xml
+            **/lcov.info
+
+  #-----------------------------------------------------------------------------------
+  # Analysis Tools: OWASP / Fossa scans  and SonarQube analysis.
+  # Depends on the build job to be completed first.
+  #-----------------------------------------------------------------------------------
+ 
+  dependency-scan:
+    name: OWASP Dependency Check
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run OWASP Dependency Check
+        run: mvn org.owasp:dependency-check-maven:check
+
+
+  sonar:
+    name: SonarCloud Scan
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download coverage
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage
+          path: coverage
+
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@v2
+        with:
+          args: >
+            -Dsonar.projectKey=your_project_key
+            -Dsonar.organization=your_org
+            -Dsonar.coverage.jacoco.xmlReportPaths=coverage/**/jacoco.xml
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
