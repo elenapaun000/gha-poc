@@ -617,6 +617,12 @@ Bundle-DocURL:
         <version>1.0.1</version>
         <scope>test</scope>
       </dependency>
+      <dependency>
+        <groupId>org.owasp</groupId>
+        <artifactId>dependency-check-maven</artifactId>
+        <version>12.2.0</version>
+        <scope>check</scope>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 </project>
