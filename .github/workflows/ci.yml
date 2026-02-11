@@ -135,7 +135,7 @@ jobs:
       # SonarCloud via Maven (NOT github action)
       - name: SonarCloud Scan
         run: |
-          ./mvnw -B
+          ./mvnw -B clean verify \
           org.sonarsource.scanner.maven:sonar-maven-plugin:4.0.0.4121:sonar \
           -Dsonar.projectKey=elenapaun000_gha-poc \
           -Dsonar.organization=elenapaun000 \
@@ -145,6 +145,7 @@ jobs:
           -Dsonar.coverage.jacoco.xmlReportPaths=**/target/site/jacoco/jacoco.xml
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
 
   dependency-scan:
     name: OWASP Dependency Check
