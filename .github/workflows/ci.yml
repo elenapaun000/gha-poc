@@ -122,6 +122,7 @@ jobs:
             -Dsonar.coverage.jacoco.xmlReportPaths=coverage/**/jacoco.xml \
             -Dsonar.coverage.exclusions=**/*test.js,**/*mock.js,**/*test.ts,**/*test.tsx,**/*mock.ts,**/*mock.tsx,icons,src/**/mocks/**/*,**/constants/**/* \
             -Dsonar.cpd.exclusions=**/*test.js,**/*mock.js,**/*test.ts,**/*test.tsx,**/*mock.ts,**/*mock.tsx,icons,src/**/__tests__/**/*,src/**/mocks/**/*,**/constants/**/*,**/mocks/**
+            -Dsonar.host.url=https://sonarcloud.io
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
@@ -144,5 +145,6 @@ jobs:
             maven-
 
       - name: Run OWASP Dependency Check
-        run: mvn org.owasp:dependency-check-maven:check
+        run: mvn org.owasp:dependency-check-maven:check \
+              -Dnvd.api.key=${{ secrets.NVD_API_KEY }}
 
