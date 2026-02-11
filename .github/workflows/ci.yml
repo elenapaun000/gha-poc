@@ -105,14 +105,27 @@ jobs:
           restore-keys: |
             maven-
 
-      - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@v2
-        with:
-          args: >
-            -Dsonar.coverage.jacoco.xmlReportPaths=coverage/**/jacoco.xml
+      # - name: SonarCloud Scan
+      #   uses: SonarSource/sonarcloud-github-action@v2
+      #   with:
+      #     args: >
+      #       -Dsonar.coverage.jacoco.xmlReportPaths=coverage/**/jacoco.xml
+      #   env:
+      #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+ 
+
+      - name: SonarCloud Scan (Maven)
+        run: |
+          ./mvnw -B clean verify sonar:sonar \
+            -Dsonar.projectKey=elenapaun000_gha-poc \
+            -Dsonar.organization=elenapaun000 \
+            -Dsonar.coverage.jacoco.xmlReportPaths=coverage/**/jacoco.xml \
+            -Dsonar.coverage.exclusions=**/*test.js,**/*mock.js,**/*test.ts,**/*test.tsx,**/*mock.ts,**/*mock.tsx,icons,src/**/mocks/**/*,**/constants/**/* \
+            -Dsonar.cpd.exclusions=**/*test.js,**/*mock.js,**/*test.ts,**/*test.tsx,**/*mock.ts,**/*mock.tsx,icons,src/**/__tests__/**/*,src/**/mocks/**/*,**/constants/**/*,**/mocks/**
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
- 
+
+
   dependency-scan:
     name: OWASP Dependency Check
     runs-on: ubuntu-latest
