@@ -1,0 +1,5 @@
+version: 3
+server: https://proj.fossa.com
+project:
+  team: AEMEU-50332
+  policy: Website/Hosted Service Use
