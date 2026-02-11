@@ -109,8 +109,6 @@ jobs:
         uses: SonarSource/sonarcloud-github-action@v2
         with:
           args: >
-            -Dsonar.projectKey=elenapaun000_gha-poc
-            -Dsonar.organization=elenapaun000
             -Dsonar.coverage.jacoco.xmlReportPaths=coverage/**/jacoco.xml
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
